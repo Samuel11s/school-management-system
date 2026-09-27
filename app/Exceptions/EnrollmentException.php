@@ -47,6 +47,11 @@ class EnrollmentException extends DomainRuleException
         return new self("The student is already enrolled in this course this term (class {$sectionName}).", 'student_id');
     }
 
+    public static function coursePassed(string $courseCode): self
+    {
+        return new self("The student has already passed {$courseCode}.", 'student_id');
+    }
+
     public static function sectionFull(Section $section): self
     {
         return new self("Class {$section->name} is full ({$section->capacity} seats).", 'section_id');

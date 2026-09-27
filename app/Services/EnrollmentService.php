@@ -159,6 +159,10 @@ final class EnrollmentService
             throw EnrollmentException::enrollmentWindowClosed($section);
         }
 
+        if (in_array($section->course_id, $this->passedCourseIds($student), true)) {
+            throw EnrollmentException::coursePassed($section->course->code);
+        }
+
         $missing = $this->missingPrerequisites($student, $section);
 
         if ($missing !== []) {
@@ -177,18 +181,29 @@ final class EnrollmentService
             return [];
         }
 
-        $passedCourseIds = Enrollment::query()
-            ->join('sections', 'sections.id', '=', 'enrollments.section_id')
-            ->where('enrollments.student_id', $student->id)
-            ->where('enrollments.status', EnrollmentStatus::Completed->value)
-            ->where('enrollments.final_score', '>=', $this->gradebook->calculator()->passingScore())
-            ->pluck('sections.course_id')
-            ->all();
+        $passedCourseIds = $this->passedCourseIds($student);
 
         return $prerequisites
             ->reject(fn ($course) => in_array($course->id, $passedCourseIds, true))
             ->pluck('code')
             ->values()
+            ->all();
+    }
+
+    /**
+     * Courses the student has completed with a passing final score.
+     *
+     * @return list<int>
+     */
+    private function passedCourseIds(Student $student): array
+    {
+        return Enrollment::query()
+            ->join('sections', 'sections.id', '=', 'enrollments.section_id')
+            ->where('enrollments.student_id', $student->id)
+            ->where('enrollments.status', EnrollmentStatus::Completed->value)
+            ->where('enrollments.final_score', '>=', $this->gradebook->calculator()->passingScore())
+            ->pluck('sections.course_id')
+            ->map(fn ($id) => (int) $id)
             ->all();
     }
 
