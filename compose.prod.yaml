@@ -1,0 +1,121 @@
+# Production-style stack: immutable images, no source bind mounts, non-root
+# PHP containers, secrets supplied at runtime through .env.production.
+#
+#   cp .env.production.example .env.production   # then fill in real values
+#   alias dcp='docker compose --env-file .env.production -f compose.prod.yaml'
+#   dcp build
+#   dcp run --rm migrate
+#   dcp up -d
+#
+# TLS is expected to be terminated by a reverse proxy / load balancer in
+# front of the "web" service (see README, "Deployment").
+
+name: school-management-prod
+
+x-app: &app
+  image: ${APP_IMAGE:-school-management-app:latest}
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+    target: production
+  env_file:
+    - .env.production
+  volumes:
+    # Uploaded files and logs survive container replacement.
+    - app-storage:/var/www/html/storage
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+    - /var/www/html/bootstrap/cache:uid=82,gid=82
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  app:
+    <<: *app
+    healthcheck:
+      test: ["CMD", "php-fpm-healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  web:
+    image: ${WEB_IMAGE:-school-management-web:latest}
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: web
+    environment:
+      PHP_FPM_HOST: app
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+
+  queue:
+    <<: *app
+    command: ["php", "artisan", "queue:work", "--tries=3", "--backoff=10", "--max-time=3600", "--memory=256"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'queue:work' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  scheduler:
+    <<: *app
+    command: ["php", "artisan", "schedule:work"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'schedule:work' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # One-off: docker compose --env-file .env.production -f compose.prod.yaml run --rm migrate
+  migrate:
+    <<: *app
+    command: ["php", "artisan", "migrate", "--force"]
+    restart: "no"
+    profiles: ["ops"]
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:?Set DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME:?Set DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  app-storage:
+  db-data:
+  redis-data:

@@ -1,0 +1,24 @@
+# Never send secrets, local state or dependencies to the build context.
+.env
+.env.*
+!.env.example
+.git
+.github
+.idea
+.vscode
+node_modules
+vendor
+public/build
+public/hot
+storage/app/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+storage/logs/*
+bootstrap/cache/*.php
+database/*.sqlite
+coverage*
+junit*.xml
+*.log
+compose*.yaml

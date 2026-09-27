@@ -104,7 +104,13 @@ RUN rm -f .env \
     && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs storage/app/private bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
+COPY docker/php/entrypoint-production.sh /usr/local/bin/entrypoint-production
+RUN chmod +x /usr/local/bin/entrypoint-production
+
 USER www-data
+
+ENTRYPOINT ["/sbin/tini", "--", "entrypoint-production"]
+CMD ["php-fpm"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD php-fpm-healthcheck || exit 1
