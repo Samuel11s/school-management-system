@@ -15,6 +15,14 @@ abstract class TestCase extends BaseTestCase
 
     protected string $seeder = RolesAndPermissionsSeeder::class;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Tests must not depend on compiled front-end assets.
+        $this->withoutVite();
+    }
+
     protected function admin(array $attributes = []): User
     {
         return User::factory()->admin()->create($attributes);

@@ -111,6 +111,29 @@ class CatalogManagementTest extends TestCase
         $this->assertTrue(AcademicTerm::query()->where('code', 'SP2027')->value('is_current'));
     }
 
+    public function test_admin_sets_the_current_term_and_terms_with_classes_are_kept(): void
+    {
+        $current = AcademicTerm::factory()->current()->create();
+        $next = AcademicTerm::factory()->create();
+        $used = $this->section()->term;
+
+        Livewire::actingAs($this->admin())->test(Terms\Index::class)
+            ->assertSee($next->name)
+            ->call('makeCurrent', $next->id)
+            ->call('delete', $used->id)
+            ->call('delete', $current->id);
+
+        $this->assertTrue($next->fresh()->is_current);
+        $this->assertModelExists($used);
+        $this->assertModelMissing($current);
+    }
+
+    public function test_terms_screen_is_admin_only(): void
+    {
+        $this->actingAs($this->teacher())->get(route('terms.index'))->assertForbidden();
+        $this->actingAs($this->teacher())->get(route('terms.create'))->assertForbidden();
+    }
+
     public function test_admin_can_create_a_class_and_duplicates_are_rejected(): void
     {
         $term = $this->openTerm();
