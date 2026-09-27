@@ -1,0 +1,136 @@
+# Local development stack.
+#
+#   docker compose up -d            start app, web, db, redis, queue, scheduler, mailpit
+#   docker compose exec app bash    open a shell in the PHP container
+#
+# Production uses compose.prod.yaml (immutable images, no bind mounts).
+
+name: school-management
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+    target: dev
+  image: school-management-dev:latest
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    DB_CONNECTION: pgsql
+    DB_HOST: db
+    DB_PORT: 5432
+    REDIS_HOST: redis
+    MAIL_MAILER: smtp
+    MAIL_HOST: mailpit
+    MAIL_PORT: 1025
+  volumes:
+    - .:/var/www/html
+    # Keep vendor/ inside a named volume: far faster than a host bind mount
+    # on Windows/macOS, and avoids host/container platform mismatches.
+    - vendor:/var/www/html/vendor
+    - composer-cache:/tmp/composer
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *app
+    healthcheck:
+      test: ["CMD", "php-fpm-healthcheck"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  web:
+    image: nginx:1.27-alpine
+    environment:
+      PHP_FPM_HOST: app
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./docker/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/nginx-health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  queue:
+    <<: *app
+    command: ["php", "artisan", "queue:work", "--tries=3", "--backoff=10", "--max-time=3600"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'queue:work' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  scheduler:
+    <<: *app
+    command: ["php", "artisan", "schedule:work"]
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'schedule:work' > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-school_management}
+      POSTGRES_USER: ${DB_USERNAME:-school}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "${FORWARD_DB_PORT:-5433}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.21
+    ports:
+      - "${FORWARD_MAILPIT_UI_PORT:-8025}:8025"
+    restart: unless-stopped
+
+  # One-off front-end tooling: docker compose run --rm node npm run build
+  node:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node-modules:/app/node_modules
+    profiles: ["tools"]
+
+volumes:
+  vendor:
+  composer-cache:
+  node-modules:
+  db-data:
+  redis-data:
