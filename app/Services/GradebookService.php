@@ -112,7 +112,10 @@ final class GradebookService
             $grades = collect();
 
             foreach ($entries as $enrollmentId => $entry) {
+                // A cleared score removes a previously recorded grade.
                 if ($entry['score'] === null || $entry['score'] === '') {
+                    $assessment->grades()->where('enrollment_id', $enrollmentId)->delete();
+
                     continue;
                 }
 
