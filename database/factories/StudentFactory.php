@@ -43,11 +43,12 @@ class StudentFactory extends Factory
      */
     public function withAccount(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'user_id' => User::factory()->withRole(Role::Student)->state([
+        // A lazy attribute receives the final attributes, including create() overrides.
+        return $this->state([
+            'user_id' => fn (array $attributes) => User::factory()->withRole(Role::Student)->create([
                 'name' => $attributes['first_name'].' '.$attributes['last_name'],
                 'email' => $attributes['email'],
-            ]),
+            ])->id,
         ]);
     }
 }
