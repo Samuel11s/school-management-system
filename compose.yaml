@@ -13,9 +13,6 @@ x-app: &app
     dockerfile: docker/php/Dockerfile
     target: dev
   image: school-management-dev:latest
-  env_file:
-    - path: .env
-      required: false
   environment:
     DB_CONNECTION: pgsql
     DB_HOST: db
