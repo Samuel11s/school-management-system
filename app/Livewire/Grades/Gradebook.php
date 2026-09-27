@@ -4,7 +4,6 @@ namespace App\Livewire\Grades;
 
 use App\Enums\AssessmentType;
 use App\Exceptions\DomainRuleException;
-use App\Models\Assessment;
 use App\Models\Section;
 use App\Services\GradebookService;
 use Illuminate\Contracts\View\View;
@@ -138,7 +137,7 @@ class Gradebook extends Component
 
         foreach ($this->scores as $enrollmentId => $row) {
             foreach ($row as $assessmentId => $score) {
-                $max = (float) ($assessments->get($assessmentId)?->max_score ?? 0);
+                $max = (float) ($assessments->get($assessmentId)->max_score ?? 0);
                 $rules["scores.$enrollmentId.$assessmentId"] = ['nullable', 'numeric', 'min:0', 'max:'.$max];
                 $attributes["scores.$enrollmentId.$assessmentId"] = 'score';
             }

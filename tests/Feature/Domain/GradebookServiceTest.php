@@ -9,6 +9,7 @@ use App\Models\Grade;
 use App\Services\GradebookService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\BuildsSchool;
 use Tests\TestCase;
 
@@ -92,7 +93,7 @@ class GradebookServiceTest extends TestCase
         return ['negative' => [-1.0], 'above maximum' => [50.01]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidScores')]
+    #[DataProvider('invalidScores')]
     public function test_invalid_scores_are_rejected(float $score): void
     {
         $section = $this->section();

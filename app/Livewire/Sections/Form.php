@@ -52,6 +52,9 @@ class Form extends Component
         $this->course_id = request()->integer('course') ?: '';
     }
 
+    /**
+     * @return array<string, array<int, mixed>>
+     */
     protected function rules(): array
     {
         return SectionRules::rules([
@@ -60,6 +63,9 @@ class Form extends Component
         ], $this->section);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function messages(): array
     {
         return SectionRules::messages();
@@ -70,7 +76,9 @@ class Form extends Component
         $this->section ? $this->authorize('update', $this->section) : $this->authorize('create', Section::class);
 
         $this->code = strtoupper(trim($this->code));
-        $data = collect($this->validate())->map(fn ($v) => $v === '' ? null : $v)->all();
+        /** @var array<string, mixed> $validated */
+        $validated = $this->validate();
+        $data = collect($validated)->map(fn ($v) => $v === '' ? null : $v)->all();
 
         try {
             $section = $catalog->saveSection($data, $this->section);

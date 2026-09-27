@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api\V1;
 
-use App\Enums\Permission;
 use App\Enums\AttendanceStatus;
+use App\Enums\Permission;
 use Illuminate\Validation\Rule;
 
 class AttendanceRequest extends ApiRequest

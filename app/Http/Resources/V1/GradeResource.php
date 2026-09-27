@@ -24,7 +24,7 @@ class GradeResource extends JsonResource
             'score' => (float) $this->score,
             'percentage' => $this->whenLoaded('assessment', fn () => $this->percentage),
             'feedback' => $this->feedback,
-            'graded_at' => $this->graded_at?->toIso8601String(),
+            'graded_at' => $this->graded_at->toIso8601String(),
             'assessment' => new AssessmentResource($this->whenLoaded('assessment')),
         ];
     }

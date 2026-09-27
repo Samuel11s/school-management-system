@@ -19,6 +19,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\BuildsSchool;
 use Tests\TestCase;
 
@@ -122,7 +123,7 @@ class EnrollmentServiceTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('ineligibleStatuses')]
+    #[DataProvider('ineligibleStatuses')]
     public function test_only_active_students_are_eligible(StudentStatus $status): void
     {
         $this->expectException(EnrollmentException::class);

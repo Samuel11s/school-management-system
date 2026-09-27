@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api\V1;
 
-use App\Enums\Permission;
 use App\Enums\AssessmentType;
+use App\Enums\Permission;
 use App\Models\Assessment;
 use Illuminate\Validation\Rule;
 
@@ -26,7 +26,7 @@ class AssessmentRequest extends ApiRequest
     {
         /** @var Assessment|null $assessment */
         $assessment = $this->route('assessment');
-        $sectionId = $assessment?->section_id ?? $this->input('section_id');
+        $sectionId = $assessment->section_id ?? $this->input('section_id');
 
         $rules = [
             'title' => ['required', 'string', 'max:255', Rule::unique('assessments', 'title')->where('section_id', $sectionId)->ignore($assessment?->id)],

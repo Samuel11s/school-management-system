@@ -29,7 +29,7 @@ class StudentResource extends JsonResource
             'full_name' => $this->full_name,
             'email' => $this->email,
             'grade_level' => $this->grade_level,
-            'admission_date' => $this->admission_date?->toDateString(),
+            'admission_date' => $this->admission_date->toDateString(),
             'status' => $this->status->value,
             'has_photo' => $this->photo_path !== null,
             'has_account' => $this->user_id !== null,

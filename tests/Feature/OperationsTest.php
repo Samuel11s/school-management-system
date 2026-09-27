@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class OperationsTest extends TestCase
@@ -51,7 +52,7 @@ class OperationsTest extends TestCase
         $this->withHeader('X-Request-Id', 'abc-123-trace')->get('/login')->assertHeader('X-Request-Id', 'abc-123-trace');
         // Malformed ids are replaced rather than echoed back.
         $generated = $this->withHeader('X-Request-Id', '<bad id>')->get('/login')->headers->get('X-Request-Id');
-        $this->assertTrue(\Illuminate\Support\Str::isUuid($generated));
+        $this->assertTrue(Str::isUuid($generated));
     }
 
     public function test_maintenance_tasks_are_scheduled(): void

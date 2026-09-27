@@ -50,9 +50,9 @@ return [
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => implode("
+        'description' => implode('
 
-", [
+', [
             'Versioned REST API of the School Management System for mobile and third-party clients.',
             'Authenticate with `POST /api/v1/auth/token` and send the returned token as `Authorization: Bearer <token>`. '
             .'All responses are JSON. Lists are paginated (`page`, `per_page` up to 100) and support `filter[...]` and `sort` '

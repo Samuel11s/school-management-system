@@ -1,9 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "school/school-management-system",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "School management system: students, courses, enrollment, grading, attendance and a versioned REST API.",
+    "keywords": [
+        "laravel",
+        "livewire",
+        "school",
+        "education",
+        "api"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.3",
@@ -42,17 +48,34 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
-            "@php artisan migrate --force",
-            "npm install --ignore-scripts",
+            "@php artisan migrate --seed --force",
+            "npm ci",
             "npm run build"
         ],
-        "dev": [
-            "Composer\\Config::disableProcessTimeout",
-            "@php artisan dev"
+        "lint": [
+            "vendor/bin/pint --test"
+        ],
+        "format": [
+            "vendor/bin/pint"
+        ],
+        "analyse": [
+            "@php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress"
         ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test"
+        ],
+        "test:coverage": [
+            "@php artisan config:clear --ansi @no_additional_args",
+            "@php artisan test --coverage --min=80"
+        ],
+        "check": [
+            "@lint",
+            "@analyse",
+            "@test"
+        ],
+        "docs:api": [
+            "@php artisan scramble:export"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
@@ -83,10 +106,18 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts-descriptions": {
+        "lint": "Check code style with Pint",
+        "format": "Fix code style with Pint",
+        "analyse": "Static analysis with Larastan",
+        "test": "Run the test suite",
+        "test:coverage": "Run the test suite with coverage (requires PCOV or Xdebug)",
+        "check": "Run lint, static analysis and tests",
+        "docs:api": "Export the OpenAPI document to docs/openapi.json"
+    }
 }

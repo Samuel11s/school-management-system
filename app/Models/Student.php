@@ -39,9 +39,7 @@ class Student extends Model
     {
         static::creating(function (Student $student) {
             if (blank($student->student_number)) {
-                $student->student_number = static::nextStudentNumber(
-                    (int) ($student->admission_date?->year ?? now()->year)
-                );
+                $student->student_number = static::nextStudentNumber($student->admission_date->year);
             }
         });
     }

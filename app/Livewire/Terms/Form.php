@@ -50,11 +50,17 @@ class Form extends Component
         $this->authorize('create', AcademicTerm::class);
     }
 
+    /**
+     * @return array<string, array<int, mixed>>
+     */
     protected function rules(): array
     {
         return AcademicTermRules::rules($this->term);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function messages(): array
     {
         return AcademicTermRules::messages();

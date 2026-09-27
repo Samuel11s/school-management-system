@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\AssessmentType;
 use App\Enums\AttendanceStatus;
 use App\Enums\EnrollmentStatus;
-use App\Enums\Role;
 use App\Enums\StudentStatus;
 use App\Exceptions\DomainRuleException;
 use App\Models\AcademicTerm;

@@ -87,7 +87,7 @@ class Show extends Component
         $roster = $canViewRoster
             ? $section->enrollments()
                 ->with('student')
-                ->when($this->rosterFilter !== 'all', fn ($q) => $q->where('status', EnrollmentStatus::tryFrom($this->rosterFilter)?->value ?? 'enrolled'))
+                ->when($this->rosterFilter !== 'all', fn ($q) => $q->where('status', EnrollmentStatus::tryFrom($this->rosterFilter)->value ?? 'enrolled'))
                 ->get()
                 ->sortBy(fn (Enrollment $e) => $e->student->last_name.' '.$e->student->first_name)
             : collect();

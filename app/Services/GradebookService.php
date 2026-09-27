@@ -153,13 +153,11 @@ final class GradebookService
     /**
      * Class gradebook summary: per-assessment averages and per-student scores.
      *
-     * @return array{
-     *     assessments: Collection<int, array{assessment: Assessment, average: float|null, graded: int}>,
-     *     students: Collection<int, array{enrollment: Enrollment, score: float|null, letter: string|null, passing: bool}>,
-     *     class_average: float|null,
-     *     distribution: array<string, int>,
-     *     total_weight: float
-     * }
+     * Keys: assessments (assessment, average, graded), students (enrollment,
+     * score, letter, passing), class_average, distribution (letter => count)
+     * and total_weight.
+     *
+     * @return array<string, mixed>
      */
     public function sectionSummary(Section $section): array
     {

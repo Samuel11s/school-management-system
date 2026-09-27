@@ -7,6 +7,7 @@ use Livewire\Attributes\Url;
 /**
  * Column sorting for list components. Only columns listed in sortableColumns()
  * are accepted, so the sort field can never be used for SQL injection.
+ * Components using it must also use Livewire's WithPagination.
  */
 trait WithSorting
 {
@@ -32,9 +33,7 @@ trait WithSorting
         $this->sortDirection = $this->currentSortField() === $field && $this->sortDirection === 'asc' ? 'desc' : 'asc';
         $this->sortField = $field;
 
-        if (method_exists($this, 'resetPage')) {
-            $this->resetPage();
-        }
+        $this->resetPage();
     }
 
     protected function currentSortField(): string

@@ -116,6 +116,7 @@ class Form extends Component
             ? $this->authorize('update', $this->student)
             : $this->authorize('create', Student::class);
 
+        /** @var array<string, mixed> $validated */
         $validated = $this->validate();
         $data = collect($validated)
             ->except(['photo', 'status_reason', 'create_account'])

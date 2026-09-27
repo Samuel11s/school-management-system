@@ -89,7 +89,10 @@ class AttendanceController extends ApiController
     {
         Gate::authorize('manageAttendance', $section);
 
-        $entries = collect($request->validated('entries'))
+        /** @var list<array{student_id: int, status: string, remarks?: string|null}> $validatedEntries */
+        $validatedEntries = $request->validated('entries');
+
+        $entries = collect($validatedEntries)
             ->mapWithKeys(fn (array $entry) => [$entry['student_id'] => [
                 'status' => $entry['status'],
                 'remarks' => $entry['remarks'] ?? null,

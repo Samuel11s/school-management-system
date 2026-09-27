@@ -45,11 +45,17 @@ class Form extends Component
         $this->authorize('create', Course::class);
     }
 
+    /**
+     * @return array<string, array<int, mixed>>
+     */
     protected function rules(): array
     {
         return CourseRules::rules($this->course);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function messages(): array
     {
         return CourseRules::messages();
@@ -60,6 +66,7 @@ class Form extends Component
         $this->course ? $this->authorize('update', $this->course) : $this->authorize('create', Course::class);
 
         $this->code = strtoupper(trim($this->code));
+        /** @var array<string, mixed> $validated */
         $validated = $this->validate();
         $data = collect($validated)->except('prerequisite_ids')->map(fn ($v) => $v === '' ? null : $v)->all();
 

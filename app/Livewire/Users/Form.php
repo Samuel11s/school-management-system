@@ -37,6 +37,9 @@ class Form extends Component
         $this->authorize('create', User::class);
     }
 
+    /**
+     * @return array<string, array<int, mixed>>
+     */
     protected function rules(): array
     {
         return [

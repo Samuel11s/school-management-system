@@ -96,7 +96,6 @@ final class CatalogService
             $data['code'] = strtoupper($data['code']);
         }
 
-
         return DB::transaction(function () use ($data, $section) {
             if ($section !== null) {
                 $enrolled = $section->activeEnrollments()->count();

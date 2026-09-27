@@ -93,11 +93,11 @@ class Section extends Model
     /**
      * Display name such as "MATH101-A".
      *
-     * @return Attribute<string, never>
+     * @return Attribute<non-falsy-string, never>
      */
     protected function name(): Attribute
     {
-        return Attribute::get(fn () => ($this->course?->code ?? 'SECTION').'-'.$this->code);
+        return Attribute::get(fn () => $this->course->code.'-'.$this->code);
     }
 
     public function seatsTaken(): int

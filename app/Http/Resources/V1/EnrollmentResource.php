@@ -21,7 +21,7 @@ class EnrollmentResource extends JsonResource
             'student_id' => $this->student_id,
             'section_id' => $this->section_id,
             'status' => $this->status->value,
-            'enrolled_at' => $this->enrolled_at?->toIso8601String(),
+            'enrolled_at' => $this->enrolled_at->toIso8601String(),
             'dropped_at' => $this->dropped_at?->toIso8601String(),
             'completed_at' => $this->completed_at?->toIso8601String(),
             'final_score' => $this->final_score !== null ? (float) $this->final_score : null,
@@ -36,7 +36,7 @@ class EnrollmentResource extends JsonResource
                 'from_status' => $h->from_status,
                 'to_status' => $h->to_status,
                 'reason' => $h->reason,
-                'changed_at' => $h->created_at?->toIso8601String(),
+                'changed_at' => $h->created_at->toIso8601String(),
             ])->values()),
         ];
     }

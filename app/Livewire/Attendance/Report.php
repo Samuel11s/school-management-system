@@ -76,10 +76,13 @@ class Report extends Component
         $user = auth()->user();
 
         // The summary ignores the status filter so that rates stay meaningful.
-        $summary = $attendance->summarize($this->filteredQuery($user, withStatus: false))
-            ->when($this->belowThresholdOnly, fn ($rows) => $rows->where('below_threshold', true))
-            ->sortBy('rate')
-            ->values();
+        $summary = $attendance->summarize($this->filteredQuery($user, withStatus: false));
+
+        if ($this->belowThresholdOnly) {
+            $summary = $summary->where('below_threshold', true);
+        }
+
+        $summary = $summary->sortBy('rate')->values();
 
         $students = Student::withTrashed()->whereKey($summary->pluck('student_id'))->get()->keyBy('id');
 
