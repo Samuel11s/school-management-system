@@ -27,7 +27,10 @@ final class CatalogService
      */
     public function saveCourse(array $data, array $prerequisiteIds = [], ?Course $course = null): Course
     {
-        $data['code'] = strtoupper($data['code']);
+        if (isset($data['code'])) {
+            $data['code'] = strtoupper($data['code']);
+        }
+
         $prerequisiteIds = array_values(array_unique(array_map('intval', $prerequisiteIds)));
 
         if ($course !== null) {
@@ -60,7 +63,10 @@ final class CatalogService
      */
     public function saveTerm(array $data, ?AcademicTerm $term = null): AcademicTerm
     {
-        $data['code'] = strtoupper($data['code']);
+        if (isset($data['code'])) {
+            $data['code'] = strtoupper($data['code']);
+        }
+
         $term ??= new AcademicTerm;
         $term->fill($data)->save();
 
@@ -86,7 +92,10 @@ final class CatalogService
      */
     public function saveSection(array $data, ?Section $section = null): Section
     {
-        $data['code'] = strtoupper($data['code']);
+        if (isset($data['code'])) {
+            $data['code'] = strtoupper($data['code']);
+        }
+
 
         return DB::transaction(function () use ($data, $section) {
             if ($section !== null) {

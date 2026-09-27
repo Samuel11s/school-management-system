@@ -91,7 +91,7 @@ return [
     'api' => [
         'per_page' => 15,
         'max_per_page' => 100,
-        'token_expiration_minutes' => (int) env('API_TOKEN_EXPIRATION', 60 * 24 * 7),
+        'rate_limit' => (int) env('API_RATE_LIMIT', 60),
     ],
 
 ];
