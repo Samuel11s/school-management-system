@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
+use Spatie\QueryBuilder\Enums\SortDirection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
@@ -47,8 +48,9 @@ class AttendanceController extends ApiController
                 AllowedFilter::callback('from', fn (Builder $q, $value) => $q->whereDate('attended_on', '>=', Carbon::parse($value)->toDateString())),
                 AllowedFilter::callback('to', fn (Builder $q, $value) => $q->whereDate('attended_on', '<=', Carbon::parse($value)->toDateString())),
             )
-            ->allowedSorts(AllowedSort::field('date', 'attended_on'), 'id')
-            ->defaultSort('-date')
+            ->allowedSorts($dateSort = AllowedSort::field('date', 'attended_on'), 'id')
+            // Pass the AllowedSort itself so the "date" alias maps to attended_on.
+            ->defaultSort((clone $dateSort)->defaultDirection(SortDirection::Descending))
             ->paginate($this->perPage($request))
             ->withQueryString();
 
