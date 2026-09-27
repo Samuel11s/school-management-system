@@ -73,7 +73,7 @@ return [
     |
     */
 
-    'home' => '/home',
+    'home' => '/dashboard',
 
     /*
     |--------------------------------------------------------------------------
@@ -162,19 +162,12 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Public self-registration is disabled: accounts are provisioned by
+        // administrators. Two-factor authentication and passkeys can be
+        // enabled here once their UI is added (see README, "Roadmap").
         Features::resetPasswords(),
-        // Features::emailVerification(),
         Features::updateProfileInformation(),
         Features::updatePasswords(),
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-            // 'window' => 0,
-        ]),
-        Features::passkeys([
-            'confirmPassword' => true,
-        ]),
     ],
 
 ];

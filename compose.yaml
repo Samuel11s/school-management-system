@@ -13,14 +13,7 @@ x-app: &app
     dockerfile: docker/php/Dockerfile
     target: dev
   image: school-management-dev:latest
-  environment:
-    DB_CONNECTION: pgsql
-    DB_HOST: db
-    DB_PORT: 5432
-    REDIS_HOST: redis
-    MAIL_MAILER: smtp
-    MAIL_HOST: mailpit
-    MAIL_PORT: 1025
+  # Configuration comes from the mounted .env file (see .env.example).
   volumes:
     - .:/var/www/html
     # Keep vendor/ inside a named volume: far faster than a host bind mount

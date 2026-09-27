@@ -27,7 +27,6 @@ class AppServiceProvider extends ServiceProvider
     {
         // Fail loudly in development instead of silently ignoring mistakes.
         Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
-        Model::preventAccessingMissingAttributes(! $this->app->isProduction());
 
         Password::defaults(fn () => Password::min(10)->letters()->mixedCase()->numbers());
     }
