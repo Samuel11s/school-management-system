@@ -1,9 +1,92 @@
-@import 'tailwindcss';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.min.css';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+:root {
+    --sms-sidebar-width: 15rem;
+    --sms-brand: #1d4e89;
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+body {
+    min-height: 100vh;
+    background-color: var(--bs-tertiary-bg);
+}
+
+.skip-link {
+    position: absolute;
+    left: -999px;
+    top: 0;
+    z-index: 1080;
+}
+
+.skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+}
+
+.navbar-brand-mark {
+    background-color: var(--sms-brand);
+}
+
+.sidebar .nav-link {
+    color: var(--bs-body-color);
+    border-radius: var(--bs-border-radius);
+    padding: 0.5rem 0.75rem;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:focus-visible {
+    background-color: var(--bs-secondary-bg);
+}
+
+.sidebar .nav-link.active {
+    background-color: var(--sms-brand);
+    color: #fff;
+}
+
+@media (min-width: 992px) {
+    .sidebar {
+        width: var(--sms-sidebar-width);
+        min-height: calc(100vh - 56px);
+        position: sticky;
+        top: 56px;
+    }
+}
+
+.table-loading {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.stat-card .display-6 {
+    font-weight: 600;
+}
+
+.avatar {
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+}
+
+.avatar-lg {
+    width: 7rem;
+    height: 7rem;
+    object-fit: cover;
+}
+
+.gradebook-input {
+    min-width: 5.5rem;
+}
+
+.sortable-header {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-weight: inherit;
+    color: inherit;
+}
+
+:focus-visible {
+    outline: 3px solid rgba(29, 78, 137, 0.6);
+    outline-offset: 2px;
 }
