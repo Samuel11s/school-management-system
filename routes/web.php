@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\StudentPhotoController;
 use App\Livewire\Attendance;
 use App\Livewire\Courses;
@@ -13,6 +14,9 @@ use App\Livewire\Users;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
+
+// Readiness probe (liveness is Laravel's built-in /up).
+Route::get('/health/ready', HealthController::class)->middleware('throttle:60,1')->name('health.ready');
 
 /*
 | Every page requires an authenticated, active account. Authorization for

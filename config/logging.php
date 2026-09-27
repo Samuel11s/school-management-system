@@ -73,6 +73,28 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Structured (one JSON object per line) logs for log aggregators.
+        'json' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.json.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'max_files' => env('LOG_DAILY_DAYS', 14),
+            'formatter' => Monolog\Formatter\JsonFormatter::class,
+            'replace_placeholders' => true,
+        ],
+
+        // Structured logs on stderr: recommended for containers.
+        'stderr_json' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'info'),
+            'handler' => StreamHandler::class,
+            'handler_with' => [
+                'stream' => 'php://stderr',
+            ],
+            'formatter' => Monolog\Formatter\JsonFormatter::class,
+            'processors' => [PsrLogMessageProcessor::class],
+        ],
+
         'monthly' => [
             'driver' => 'monthly',
             'path' => storage_path('logs/laravel.log'),
