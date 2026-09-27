@@ -7,7 +7,7 @@
         </span>
         <div>
             <p class="text-body-secondary small mb-0">{{ $label }}</p>
-            <p class="display-6 fs-3 mb-0">{{ $value }}</p>
+            <p @class(['mb-0', 'display-6 fs-3' => is_numeric($value), 'fs-6 fw-semibold' => ! is_numeric($value)])>{{ $value }}</p>
             @if ($href)
                 <a href="{{ $href }}" class="stretched-link small"><span class="visually-hidden">View {{ $label }}</span></a>
             @endif

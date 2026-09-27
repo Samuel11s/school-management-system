@@ -51,9 +51,13 @@ RUN install-php-extensions pcov @composer \
     && apk add --no-cache git unzip
 
 COPY docker/php/conf.d/dev.ini /usr/local/etc/php/conf.d/zz-dev.ini
+COPY docker/php/php-fpm.d/zz-dev.conf /usr/local/etc/php-fpm.d/zz-dev.conf
 
 ENV COMPOSER_HOME=/tmp/composer \
     COMPOSER_CACHE_DIR=/tmp/composer/cache
+
+# -R allows the dev-only root worker pool (see php-fpm.d/zz-dev.conf).
+CMD ["php-fpm", "-R"]
 
 ############################
 # vendor
