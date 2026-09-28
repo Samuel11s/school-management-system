@@ -41,7 +41,7 @@
     </div>
 
     <section class="card shadow-sm mb-4" aria-labelledby="summary-heading">
-        <div class="card-header bg-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
             <h2 id="summary-heading" class="h5 mb-0">Summary by student <span class="small text-body-secondary">({{ $summaryTotal }})</span></h2>
             <div class="form-check form-switch mb-0">
                 <input class="form-check-input" type="checkbox" role="switch" id="below-threshold" wire:model.live="belowThresholdOnly">
@@ -62,7 +62,7 @@
                             <th scope="col" class="text-end">Late</th>
                             <th scope="col" class="text-end">Absent</th>
                             <th scope="col" class="text-end">Excused</th>
-                            <th scope="col" class="text-end">Rate</th>
+                            <th scope="col">Rate</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,10 +81,15 @@
                                 <td class="text-end">{{ $row['late'] }}</td>
                                 <td class="text-end">{{ $row['absent'] }}</td>
                                 <td class="text-end">{{ $row['excused'] }}</td>
-                                <td class="text-end">
+                                <td style="min-width: 10rem">
                                     @if ($row['rate'] !== null)
-                                        <span @class(['fw-semibold text-danger' => $row['below_threshold']])>{{ $row['rate'] }}%</span>
-                                        @if ($row['below_threshold']) <i class="bi bi-exclamation-triangle-fill text-danger" aria-label="Below threshold"></i> @endif
+                                        <div class="meter small">
+                                            <div class="progress" aria-hidden="true">
+                                                <div @class(['progress-bar', 'bg-chart-absent' => $row['below_threshold'], 'bg-chart-present' => ! $row['below_threshold']]) style="width: {{ $row['rate'] }}%"></div>
+                                            </div>
+                                            <span @class(['text-nowrap text-end', 'fw-semibold text-danger' => $row['below_threshold']]) style="min-width: 3.5rem">{{ $row['rate'] }}%</span>
+                                            @if ($row['below_threshold']) <i class="bi bi-exclamation-triangle-fill text-danger" role="img" aria-label="Below threshold"></i> @endif
+                                        </div>
                                     @else
                                         —
                                     @endif
@@ -95,13 +100,13 @@
                 </table>
             </div>
             @if ($summaryTotal > $summary->count())
-                <div class="card-footer bg-body small text-body-secondary">Showing the {{ $summary->count() }} lowest rates. Narrow the filters to see others.</div>
+                <div class="card-footer small text-body-secondary">Showing the {{ $summary->count() }} lowest rates. Narrow the filters to see others.</div>
             @endif
         @endif
     </section>
 
     <section class="card shadow-sm" aria-labelledby="records-heading">
-        <div class="card-header bg-body"><h2 id="records-heading" class="h5 mb-0">Records</h2></div>
+        <div class="card-header"><h2 id="records-heading" class="h5 mb-0">Records</h2></div>
         @if ($records->isEmpty())
             <x-empty-state icon="bi-list-check" title="No records" />
         @else
@@ -125,7 +130,7 @@
                 </table>
             </div>
             @if ($records->hasPages())
-                <div class="card-footer bg-body">{{ $records->links() }}</div>
+                <div class="card-footer">{{ $records->links() }}</div>
             @endif
         @endif
     </section>

@@ -8,7 +8,7 @@
     </x-page-header>
 
     <div class="card shadow-sm">
-        <div class="card-body border-bottom">
+        <div class="card-body filter-bar">
             <form class="row g-2 align-items-end" role="search" wire:submit.prevent>
                 <div class="col-md-4">
                     <x-search-input label="Search classes by course" placeholder="Course code or title" />
@@ -79,7 +79,13 @@
                             <td>{{ $section->teacher?->name ?? 'Unassigned' }}</td>
                             <td class="small">{{ $section->schedule }}<span class="d-block text-body-secondary">{{ $section->room }}</span></td>
                             <td>
-                                <span @class(['fw-semibold text-danger' => $section->isFull()])>{{ $section->seatsTaken() }} / {{ $section->capacity }}</span>
+                                @php($fill = $section->capacity > 0 ? (int) round($section->seatsTaken() / $section->capacity * 100) : 0)
+                                <div class="meter small" style="min-width: 8rem">
+                                    <span @class(['text-nowrap', 'fw-semibold text-danger' => $section->isFull()])>{{ $section->seatsTaken() }} / {{ $section->capacity }}</span>
+                                    <div class="progress" aria-hidden="true">
+                                        <div @class(['progress-bar', 'bg-chart-absent' => $fill >= 100, 'bg-chart-late' => $fill >= 80 && $fill < 100]) style="width: {{ min($fill, 100) }}%"></div>
+                                    </div>
+                                </div>
                                 @if ($section->isFull()) <span class="visually-hidden">(full)</span> @endif
                             </td>
                             <td><x-status-badge :status="$section->status" /></td>
@@ -101,7 +107,7 @@
         </div>
 
         @if ($sections->hasPages())
-            <div class="card-footer bg-body">{{ $sections->links() }}</div>
+            <div class="card-footer">{{ $sections->links() }}</div>
         @endif
     </div>
 </div>

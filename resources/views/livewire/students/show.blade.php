@@ -20,18 +20,15 @@
         <div class="col-lg-4">
             <section class="card shadow-sm mb-4" aria-labelledby="profile-heading">
                 <div class="card-body">
-                    <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="text-center pb-3 mb-3 border-bottom">
                         @if ($student->photo_path)
-                            <img src="{{ route('students.photo', $student) }}" alt="Photo of {{ $student->full_name }}" class="rounded-circle avatar-lg">
+                            <img src="{{ route('students.photo', $student) }}" alt="Photo of {{ $student->full_name }}" class="rounded-circle avatar-lg mb-3 shadow-sm">
                         @else
-                            <span class="rounded-circle avatar-lg bg-secondary-subtle d-inline-flex align-items-center justify-content-center fs-2" aria-hidden="true">
-                                {{ mb_substr($student->first_name, 0, 1) }}{{ mb_substr($student->last_name, 0, 1) }}
-                            </span>
+                            <x-avatar :name="$student->full_name" size="xl" class="mb-3" />
                         @endif
-                        <div>
-                            <h2 id="profile-heading" class="h5 mb-1">Profile</h2>
-                            <x-status-badge :status="$student->status" />
-                        </div>
+                        <h2 id="profile-heading" class="h5 mb-1">{{ $student->full_name }}</h2>
+                        <p class="small text-body-secondary font-monospace mb-2">{{ $student->student_number }}</p>
+                        <x-status-badge :status="$student->status" />
                     </div>
 
                     <dl class="row small mb-0">
@@ -103,7 +100,7 @@
 
         <div class="col-lg-8">
             <section class="card shadow-sm" aria-labelledby="enrollments-heading">
-                <div class="card-header bg-body"><h2 id="enrollments-heading" class="h5 mb-0">Enrollments and grades</h2></div>
+                <div class="card-header"><h2 id="enrollments-heading" class="h5 mb-0">Enrollments and grades</h2></div>
                 @if ($enrollments->isEmpty())
                     <x-empty-state icon="bi-journal" title="No enrollments" />
                 @else

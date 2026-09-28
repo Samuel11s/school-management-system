@@ -5,7 +5,7 @@
     <div class="row g-4">
         <div class="col-xl-9">
             <form wire:submit="save" class="card shadow-sm" novalidate>
-                <div class="card-header bg-body d-flex flex-wrap gap-3 align-items-end justify-content-between">
+                <div class="card-header d-flex flex-wrap gap-3 align-items-end justify-content-between">
                     <div>
                         <label for="register-date" class="form-label small mb-1">Session date</label>
                         <input type="date" id="register-date" wire:model.live="date"
@@ -16,7 +16,7 @@
                     </div>
                     <div class="d-flex flex-wrap gap-2 align-items-center">
                         @if ($alreadyRecorded)
-                            <span class="badge text-bg-info">Already recorded — saving updates it</span>
+                            <span class="badge badge-soft badge-soft-info">Already recorded — saving updates it</span>
                         @endif
                         <button type="button" class="btn btn-sm btn-outline-success" wire:click="markAll('present')">Mark all present</button>
                         <button type="button" class="btn btn-sm btn-outline-danger" wire:click="markAll('absent')">Mark all absent</button>
@@ -65,7 +65,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="card-footer bg-body d-flex gap-2 align-items-center">
+                    <div class="card-footer d-flex gap-2 align-items-center">
                         <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="save">
                             <i class="bi bi-save me-1" aria-hidden="true"></i>Save register
                         </button>
@@ -77,7 +77,7 @@
 
         <aside class="col-xl-3" aria-labelledby="recent-heading">
             <div class="card shadow-sm">
-                <div class="card-header bg-body"><h2 id="recent-heading" class="h6 mb-0">Recent sessions</h2></div>
+                <div class="card-header"><h2 id="recent-heading" class="h6 mb-0">Recent sessions</h2></div>
                 @if ($recentSessions->isEmpty())
                     <x-empty-state icon="bi-calendar-x" title="No sessions recorded" />
                 @else

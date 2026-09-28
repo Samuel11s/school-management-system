@@ -23,12 +23,12 @@
                         <tr wire:key="term-{{ $term->id }}">
                             <td>
                                 <strong>{{ $term->name }}</strong> <span class="font-monospace small text-body-secondary">{{ $term->code }}</span>
-                                @if ($term->is_current) <span class="badge text-bg-success ms-1">Current</span> @endif
+                                @if ($term->is_current) <span class="badge badge-soft badge-soft-success ms-1">Current</span> @endif
                             </td>
                             <td class="small">{{ $term->starts_on->toFormattedDateString() }} – {{ $term->ends_on->toFormattedDateString() }}</td>
                             <td class="small">
                                 {{ $term->enrollment_opens_on->toFormattedDateString() }} – {{ $term->enrollment_closes_on->toFormattedDateString() }}
-                                @if ($term->isEnrollmentOpen()) <span class="badge text-bg-info ms-1">Open</span> @endif
+                                @if ($term->isEnrollmentOpen()) <span class="badge badge-soft badge-soft-info ms-1">Open</span> @endif
                             </td>
                             <td><a href="{{ route('sections.index', ['term' => $term->id]) }}">{{ $term->sections_count }}</a></td>
                             <td class="text-end text-nowrap">
@@ -48,7 +48,7 @@
             </table>
         </div>
         @if ($terms->hasPages())
-            <div class="card-footer bg-body">{{ $terms->links() }}</div>
+            <div class="card-footer">{{ $terms->links() }}</div>
         @endif
     </div>
 </div>

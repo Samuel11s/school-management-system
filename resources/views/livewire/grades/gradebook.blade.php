@@ -9,14 +9,42 @@
     </x-page-header>
 
     <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-3"><x-stat-card label="Class average" :value="$summary['class_average'] !== null ? number_format($summary['class_average'], 1).'%' : '—'" icon="bi-graph-up" /></div>
-        <div class="col-sm-6 col-lg-3"><x-stat-card label="Students" :value="$summary['students']->count()" icon="bi-people" variant="info" /></div>
-        <div class="col-sm-6 col-lg-3"><x-stat-card label="Assessments" :value="$summary['assessments']->count()" icon="bi-journal-text" variant="secondary" /></div>
-        <div class="col-sm-6 col-lg-3">
+        <div class="col-6 col-lg-3"><x-stat-card label="Class average" :value="$summary['class_average'] !== null ? number_format($summary['class_average'], 1).'%' : '—'" icon="bi-graph-up" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card label="Students" :value="$summary['students']->count()" icon="bi-people" variant="info" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card label="Assessments" :value="$summary['assessments']->count()" icon="bi-journal-text" variant="secondary" /></div>
+        <div class="col-6 col-lg-3">
             <x-stat-card label="Weight allocated" :value="rtrim(rtrim(number_format($summary['total_weight'], 2), '0'), '.').'%'" icon="bi-pie-chart"
                          :variant="$summary['total_weight'] == 100 ? 'success' : 'warning'" />
         </div>
     </div>
+
+    @php($letters = array_keys(config('school.grading.scale')))
+    @php($maxCount = max([1, ...array_values($summary['distribution'])]))
+    @if ($summary['distribution'] !== [])
+        <section class="card shadow-sm mb-4" aria-labelledby="distribution-heading">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 id="distribution-heading" class="h6 mb-0 d-flex align-items-center">
+                    <span class="card-title-icon"><i class="bi bi-bar-chart" aria-hidden="true"></i></span>Grade distribution
+                </h2>
+                <span class="small text-body-secondary">Students by current letter grade</span>
+            </div>
+            <div class="card-body">
+                <div class="column-chart" role="img"
+                     aria-label="Grade distribution: {{ collect($letters)->map(fn ($l) => $l.' '.($summary['distribution'][$l] ?? 0))->join(', ') }}">
+                    @foreach ($letters as $letter)
+                        @php($count = $summary['distribution'][$letter] ?? 0)
+                        <div class="column">
+                            <span class="column-value">{{ $count }}</span>
+                            <div class="column-bar" style="height: {{ $count / $maxCount * 100 }}%"></div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="column-labels" aria-hidden="true">
+                    @foreach ($letters as $letter)<span>{{ $letter }}</span>@endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 
     @if ($showAssessmentForm)
         <section class="card shadow-sm mb-4 border-primary" aria-labelledby="assessment-form-heading">
@@ -38,7 +66,7 @@
     @endif
 
     <form wire:submit="saveGrades" class="card shadow-sm" novalidate>
-        <div class="card-header bg-body d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h5 mb-0">Scores</h2>
             <div class="d-flex align-items-center gap-2">
                 <x-loading target="saveGrades" label="Saving" />
@@ -108,7 +136,7 @@
                                 <td class="text-end text-nowrap">
                                     @if ($row['score'] !== null)
                                         <span @class(['text-danger' => ! $row['passing']])>{{ number_format($row['score'], 1) }}%</span>
-                                        <span class="badge text-bg-secondary">{{ $row['letter'] }}</span>
+                                        <span class="badge badge-soft badge-soft-secondary">{{ $row['letter'] }}</span>
                                     @else
                                         —
                                     @endif

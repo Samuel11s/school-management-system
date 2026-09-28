@@ -6,7 +6,7 @@
     </x-page-header>
 
     <div class="card shadow-sm">
-        <div class="card-body border-bottom">
+        <div class="card-body filter-bar">
             <form class="row g-2 align-items-end" role="search" wire:submit.prevent>
                 <div class="col-md-6"><x-search-input label="Search users" placeholder="Name or email" /></div>
                 <div class="col-sm-6 col-md-3">
@@ -43,14 +43,25 @@
                 <tbody>
                     @forelse ($users as $user)
                         <tr wire:key="user-{{ $user->id }}">
-                            <td>{{ $user->name }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <x-avatar :name="$user->name" size="sm" />
+                                    <span class="fw-semibold">{{ $user->name }}</span>
+                                </div>
+                            </td>
                             <td class="small">{{ $user->email }}</td>
-                            <td>{{ $user->roles->pluck('name')->map(fn ($r) => ucfirst($r))->join(', ') ?: '—' }}</td>
+                            <td>
+                                @forelse ($user->roles as $role)
+                                    <span @class(['badge badge-soft', 'badge-soft-primary' => $role->name === 'admin', 'badge-soft-info' => $role->name === 'teacher', 'badge-soft-secondary' => $role->name === 'student'])>{{ ucfirst($role->name) }}</span>
+                                @empty
+                                    —
+                                @endforelse
+                            </td>
                             <td>
                                 @if ($user->is_active)
-                                    <span class="badge text-bg-success">Active</span>
+                                    <span class="badge badge-soft badge-soft-success">Active</span>
                                 @else
-                                    <span class="badge text-bg-secondary">Deactivated</span>
+                                    <span class="badge badge-soft badge-soft-secondary">Deactivated</span>
                                 @endif
                             </td>
                             <td class="small">{{ $user->last_login_at?->diffForHumans() ?? 'Never' }}</td>
@@ -72,7 +83,7 @@
             </table>
         </div>
         @if ($users->hasPages())
-            <div class="card-footer bg-body">{{ $users->links() }}</div>
+            <div class="card-footer">{{ $users->links() }}</div>
         @endif
     </div>
 </div>

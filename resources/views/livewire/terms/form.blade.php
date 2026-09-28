@@ -14,7 +14,7 @@
                                  help="Only one term can be current; the previous current term is unset automatically." />
             </div>
         </div>
-        <div class="card-footer bg-body d-flex gap-2">
+        <div class="card-footer d-flex gap-2">
             <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="save">
                 {{ $term ? 'Save changes' : 'Create term' }}
             </button>

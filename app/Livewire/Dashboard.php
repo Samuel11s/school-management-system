@@ -34,6 +34,7 @@ class Dashboard extends Component
             'admin' => $user->isAdmin() ? $this->adminData($term) : null,
             'teaching' => $user->isTeacher() ? $this->teacherSections($user, $term) : collect(),
             'studentClasses' => $user->student ? $this->studentClasses($user->student, $term, $gradebook) : collect(),
+            'attendance' => $this->attendanceBreakdown($user, $term),
         ]);
     }
 
@@ -49,15 +50,17 @@ class Dashboard extends Component
             'activeEnrollments' => $term
                 ? Enrollment::query()->active()->whereHas('section', fn ($q) => $q->where('academic_term_id', $term->id))->count()
                 : 0,
-            'nearlyFull' => $term
+            // Current-term classes ordered by how full they are (for the capacity chart).
+            'classFill' => $term
                 ? Section::query()
                     ->with(['course', 'teacher'])
                     ->withEnrolledCount()
                     ->where('academic_term_id', $term->id)
                     ->get()
-                    ->filter(fn (Section $s) => $s->capacity > 0 && $s->seatsTaken() / $s->capacity >= 0.8)
+                    ->filter(fn (Section $s) => $s->capacity > 0)
                     ->sortByDesc(fn (Section $s) => $s->seatsTaken() / $s->capacity)
-                    ->take(5)
+                    ->take(6)
+                    ->values()
                 : collect(),
             'recentActivity' => StatusHistory::query()
                 ->with(['subject', 'changedBy'])
@@ -66,6 +69,32 @@ class Dashboard extends Component
                 ->limit(6)
                 ->get(),
         ];
+    }
+
+    /**
+     * Attendance status counts for the current term, limited to the records
+     * the user may see (all, their classes, or their own).
+     *
+     * @return array{total: int, counts: array<string, int>}
+     */
+    private function attendanceBreakdown(User $user, ?AcademicTerm $term): array
+    {
+        $counts = array_fill_keys(AttendanceStatus::values(), 0);
+
+        if ($term !== null) {
+            AttendanceRecord::query()
+                ->visibleTo($user)
+                ->whereHas('section', fn ($q) => $q->where('academic_term_id', $term->id))
+                ->selectRaw('status, COUNT(*) as aggregate')
+                ->groupBy('status')
+                ->toBase()
+                ->get()
+                ->each(function ($row) use (&$counts) {
+                    $counts[$row->status] = (int) $row->aggregate;
+                });
+        }
+
+        return ['total' => array_sum($counts), 'counts' => $counts];
     }
 
     /**

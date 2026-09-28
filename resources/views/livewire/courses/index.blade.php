@@ -10,7 +10,7 @@
     </x-page-header>
 
     <div class="card shadow-sm">
-        <div class="card-body border-bottom">
+        <div class="card-body filter-bar">
             <form class="row g-2 align-items-end" role="search" wire:submit.prevent>
                 <div class="col-md-6">
                     <x-search-input label="Search courses" placeholder="Code or title" />
@@ -55,7 +55,7 @@
                             <td class="font-monospace">{{ $course->code }}</td>
                             <td>
                                 {{ $course->title }}
-                                @unless ($course->is_active) <span class="badge text-bg-secondary ms-1">Inactive</span> @endunless
+                                @unless ($course->is_active) <span class="badge badge-soft badge-soft-secondary ms-1">Inactive</span> @endunless
                             </td>
                             <td>{{ $course->department ?? '—' }}</td>
                             <td>{{ $course->credits }}</td>
@@ -85,7 +85,7 @@
         </div>
 
         @if ($courses->hasPages())
-            <div class="card-footer bg-body">{{ $courses->links() }}</div>
+            <div class="card-footer">{{ $courses->links() }}</div>
         @endif
     </div>
 </div>

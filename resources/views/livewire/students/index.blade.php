@@ -10,7 +10,7 @@
     </x-page-header>
 
     <div class="card shadow-sm">
-        <div class="card-body border-bottom">
+        <div class="card-body filter-bar">
             <form class="row g-2 align-items-end" role="search" wire:submit.prevent>
                 <div class="col-md-5">
                     <x-search-input label="Search students" placeholder="Name, email or student number" />
@@ -55,11 +55,14 @@
                 <tbody>
                     @forelse ($students as $student)
                         <tr wire:key="student-{{ $student->id }}">
-                            <td class="font-monospace small">{{ $student->student_number }}</td>
+                            <td class="font-monospace small text-nowrap">{{ $student->student_number }}</td>
                             <td>
-                                <a href="{{ route('students.show', $student) }}" class="fw-semibold text-decoration-none">
-                                    {{ $student->last_name }}, {{ $student->first_name }}
-                                </a>
+                                <div class="d-flex align-items-center gap-2">
+                                    <x-avatar :name="$student->full_name" size="sm" />
+                                    <a href="{{ route('students.show', $student) }}" class="fw-semibold text-decoration-none">
+                                        {{ $student->last_name }}, {{ $student->first_name }}
+                                    </a>
+                                </div>
                             </td>
                             <td class="small">{{ $student->email }}</td>
                             <td>{{ $student->grade_level ?? '—' }}</td>
@@ -95,7 +98,7 @@
         </div>
 
         @if ($students->hasPages())
-            <div class="card-footer bg-body">{{ $students->links() }}</div>
+            <div class="card-footer">{{ $students->links() }}</div>
         @endif
     </div>
 </div>

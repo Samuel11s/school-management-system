@@ -16,10 +16,10 @@
     </x-page-header>
 
     <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-lg-3"><x-stat-card label="Enrolled" :value="$section->seatsTaken().' / '.$section->capacity" icon="bi-people" /></div>
-        <div class="col-sm-6 col-lg-3"><x-stat-card label="Seats available" :value="$section->seatsAvailable()" icon="bi-door-open" :variant="$section->isFull() ? 'danger' : 'success'" /></div>
-        <div class="col-sm-6 col-lg-3"><x-stat-card label="Schedule" :value="$section->schedule ?? '—'" icon="bi-clock" variant="info" /></div>
-        <div class="col-sm-6 col-lg-3"><x-stat-card label="Room" :value="$section->room ?? '—'" icon="bi-geo-alt" variant="secondary" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card label="Enrolled" :value="$section->seatsTaken().' / '.$section->capacity" icon="bi-people" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card label="Seats available" :value="$section->seatsAvailable()" icon="bi-door-open" :variant="$section->isFull() ? 'danger' : 'success'" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card label="Schedule" :value="$section->schedule ?? '—'" icon="bi-clock" variant="info" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card label="Room" :value="$section->room ?? '—'" icon="bi-geo-alt" variant="secondary" /></div>
     </div>
 
     <p class="mb-4">
@@ -63,7 +63,7 @@
 
     @if ($canViewRoster)
         <section class="card shadow-sm mb-4" aria-labelledby="roster-heading">
-            <div class="card-header bg-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <h2 id="roster-heading" class="h5 mb-0">Class roster</h2>
                 <div>
                     <label for="roster-filter" class="visually-hidden">Show enrollments</label>
@@ -94,8 +94,13 @@
                             @foreach ($roster as $enrollment)
                                 <tr wire:key="roster-{{ $enrollment->id }}">
                                     <td>
-                                        <a href="{{ route('students.show', $enrollment->student) }}">{{ $enrollment->student->last_name }}, {{ $enrollment->student->first_name }}</a>
-                                        <span class="d-block small text-body-secondary font-monospace">{{ $enrollment->student->student_number }}</span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <x-avatar :name="$enrollment->student->full_name" size="sm" />
+                                            <div>
+                                                <a href="{{ route('students.show', $enrollment->student) }}" class="fw-semibold text-decoration-none">{{ $enrollment->student->last_name }}, {{ $enrollment->student->first_name }}</a>
+                                                <span class="d-block small text-body-secondary font-monospace">{{ $enrollment->student->student_number }}</span>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td><x-status-badge :status="$enrollment->status" /></td>
                                     <td class="small">{{ $enrollment->enrolled_at->toFormattedDateString() }}</td>
@@ -131,11 +136,11 @@
         <div class="row g-4">
             <section class="col-lg-7" aria-labelledby="my-grades-heading">
                 <div class="card shadow-sm h-100">
-                    <div class="card-header bg-body d-flex justify-content-between">
+                    <div class="card-header d-flex justify-content-between">
                         <h2 id="my-grades-heading" class="h5 mb-0">My grades</h2>
                         <span>
                             @if ($mine['score'] !== null)
-                                <strong>{{ number_format($mine['score'], 1) }}%</strong> <span class="badge text-bg-secondary">{{ $mine['letter'] }}</span>
+                                <strong>{{ number_format($mine['score'], 1) }}%</strong> <span class="badge badge-soft badge-soft-secondary">{{ $mine['letter'] }}</span>
                             @endif
                         </span>
                     </div>
@@ -172,7 +177,7 @@
             </section>
             <section class="col-lg-5" aria-labelledby="my-attendance-heading">
                 <div class="card shadow-sm h-100">
-                    <div class="card-header bg-body"><h2 id="my-attendance-heading" class="h5 mb-0">My attendance</h2></div>
+                    <div class="card-header"><h2 id="my-attendance-heading" class="h5 mb-0">My attendance</h2></div>
                     @if ($mine['attendance']->isEmpty())
                         <x-empty-state icon="bi-clipboard" title="No attendance recorded yet" />
                     @else

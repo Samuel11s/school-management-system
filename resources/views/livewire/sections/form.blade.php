@@ -16,7 +16,7 @@
                                help="Cancelling a class drops every active enrollment." />
             </div>
         </div>
-        <div class="card-footer bg-body d-flex gap-2">
+        <div class="card-footer d-flex gap-2">
             <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="save">
                 {{ $section ? 'Save changes' : 'Create class' }}
             </button>
