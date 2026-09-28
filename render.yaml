@@ -1,0 +1,81 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+#
+# One free Docker web service running Nginx, PHP-FPM, the queue worker and the
+# scheduler (docker/render/Dockerfile). The database is external (for example
+# a free Neon PostgreSQL) because Render's free PostgreSQL expires after 30
+# days. Values marked "sync: false" are secrets you are prompted for when the
+# Blueprint is created; they never live in the repository.
+
+services:
+  - type: web
+    name: school-management
+    runtime: docker
+    plan: free
+    dockerfilePath: ./docker/render/Dockerfile
+    dockerContext: .
+    healthCheckPath: /up
+    autoDeploy: true
+    envVars:
+      # --- Application -------------------------------------------------------
+      - key: APP_NAME
+        value: School Management System
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY            # php artisan key:generate --show
+        sync: false
+      - key: APP_URL            # https://<service-name>.onrender.com
+        sync: false
+      - key: TRUSTED_PROXIES
+        value: "*"
+      - key: LOG_CHANNEL
+        value: stderr_json
+      - key: LOG_LEVEL
+        value: info
+
+      # --- Database (external PostgreSQL, e.g. Neon) --------------------------
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL             # postgresql://user:password@host/dbname?sslmode=require
+        sync: false
+      - key: DB_SSLMODE
+        value: require
+
+      # --- Sessions, cache and queue in the database (no Redis needed) --------
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_ENCRYPT
+        value: "true"
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+
+      # --- Mail (optional; "log" discards mail until SMTP is configured) ------
+      - key: MAIL_MAILER
+        value: log
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_FROM_NAME
+        value: School Management System
+
+      # --- First run ------------------------------------------------------------
+      - key: RUN_MIGRATIONS
+        value: "true"
+      - key: ADMIN_EMAIL        # first administrator, created once
+        sync: false
+      - key: ADMIN_PASSWORD     # min. 10 chars, upper + lower case and a number
+        sync: false
+      - key: SEED_DEMO_DATA     # "true" loads demo data into an EMPTY database
+        value: "false"

@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -77,5 +80,38 @@ class OperationsTest extends TestCase
         $this->assertTrue(User::query()->where('email', 'head@example.com')->firstOrFail()->isAdmin());
 
         $this->artisan('school:create-admin', ['email' => 'head@example.com', '--send-reset-link' => true])->assertFailed();
+    }
+
+    public function test_create_admin_can_read_password_from_environment_and_is_idempotent(): void
+    {
+        putenv('TEST_ADMIN_PASSWORD=Env0nlySecret');
+
+        try {
+            $this->artisan('school:create-admin', ['email' => 'Boot@Example.com', '--password-env' => 'TEST_ADMIN_PASSWORD', '--if-missing' => true])
+                ->assertSuccessful();
+            $this->artisan('school:create-admin', ['email' => 'boot@example.com', '--password-env' => 'TEST_ADMIN_PASSWORD', '--if-missing' => true])
+                ->expectsOutput('Administrator already exists; nothing to do.')
+                ->assertSuccessful();
+
+            $admin = User::query()->where('email', 'boot@example.com')->firstOrFail();
+            $this->assertTrue($admin->isAdmin());
+            $this->assertTrue(Hash::check('Env0nlySecret', $admin->password));
+
+            putenv('TEST_ADMIN_PASSWORD=weak');
+            $this->artisan('school:create-admin', ['email' => 'other@example.com', '--password-env' => 'TEST_ADMIN_PASSWORD'])->assertFailed();
+        } finally {
+            putenv('TEST_ADMIN_PASSWORD');
+        }
+    }
+
+    public function test_demo_data_is_only_loaded_into_an_empty_database(): void
+    {
+        Notification::fake();
+        Course::factory()->create();
+
+        $this->artisan('school:seed-demo')->assertSuccessful();
+
+        $this->assertSame(1, Course::query()->count());
+        $this->assertDatabaseMissing('users', ['email' => 'admin@school.test']);
     }
 }
