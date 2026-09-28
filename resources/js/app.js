@@ -40,7 +40,7 @@ export function notify(message, type = 'success') {
 
     const close = document.createElement('button');
     close.type = 'button';
-    close.className = 'btn-close btn-close-white me-2 m-auto';
+    close.className = variant === 'warning' ? 'btn-close me-2 m-auto' : 'btn-close btn-close-white me-2 m-auto';
     close.setAttribute('data-bs-dismiss', 'toast');
     close.setAttribute('aria-label', 'Close');
 
@@ -54,11 +54,39 @@ export function notify(message, type = 'success') {
 
 window.notify = notify;
 
+const debugMode = document.querySelector('meta[name="app-debug"]')?.content === 'true';
+
 document.addEventListener('livewire:init', () => {
     Livewire.on('notify', (event) => {
         const payload = Array.isArray(event) ? event[0] : event;
         notify(payload?.message, payload?.type);
     });
+
+    // Friendly error states for failed Livewire requests. Session expiry (419)
+    // keeps Livewire's default "reload the page" prompt; in debug mode server
+    // errors keep the detailed error modal.
+    Livewire.hook('request', ({ fail }) => {
+        fail(({ status, preventDefault }) => {
+            if (status === 403) {
+                preventDefault();
+                notify('You do not have permission to perform this action.', 'danger');
+            } else if (status === 429) {
+                preventDefault();
+                notify('Too many requests. Please wait a moment and try again.', 'warning');
+            } else if (status >= 500 && !debugMode) {
+                preventDefault();
+                notify('Something went wrong and your change was not saved. Please try again.', 'danger');
+            }
+        });
+    });
+});
+
+window.addEventListener('offline', () => {
+    notify('You are offline. Changes cannot be saved until your connection returns.', 'warning');
+});
+
+window.addEventListener('online', () => {
+    notify('You are back online.', 'success');
 });
 
 document.addEventListener('DOMContentLoaded', () => {
