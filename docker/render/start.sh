@@ -21,9 +21,11 @@ if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
 fi
 
 # Optional first administrator (skipped when the account already exists).
+# A rejected password must not keep the whole site offline: warn and continue.
 if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
     php artisan school:create-admin "$ADMIN_EMAIL" --name="${ADMIN_NAME:-Administrator}" \
-        --password-env=ADMIN_PASSWORD --if-missing --no-interaction
+        --password-env=ADMIN_PASSWORD --if-missing --no-interaction \
+        || echo "WARNING: administrator not created. Fix ADMIN_EMAIL/ADMIN_PASSWORD (min. 10 characters, upper and lower case, a number) and redeploy." >&2
 fi
 
 # Optional demo data for a public showcase (only loaded into an empty database).
