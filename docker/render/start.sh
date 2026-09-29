@@ -30,7 +30,8 @@ fi
 
 # Optional demo data for a public showcase (only loaded into an empty database).
 if [ "${SEED_DEMO_DATA:-false}" = "true" ]; then
-    php artisan school:seed-demo --no-interaction
+    php artisan school:seed-demo --no-interaction \
+        || echo "WARNING: demo data could not be loaded; see the error above." >&2
 fi
 
 exec supervisord -c /etc/supervisord.conf

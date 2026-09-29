@@ -5,6 +5,7 @@ use App\Models\Course;
 use App\Models\User;
 use Database\Seeders\DemoDataSeeder;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Validator;
@@ -90,7 +91,8 @@ Artisan::command('school:seed-demo', function () {
         return 0;
     }
 
-    $this->call('db:seed', ['--class' => DemoDataSeeder::class, '--force' => true]);
+    // All-or-nothing: a failure must not leave a half-seeded database behind.
+    DB::transaction(fn () => $this->call('db:seed', ['--class' => DemoDataSeeder::class, '--force' => true]));
     $this->warn('Demo data loaded. Demo accounts use the password "password": do not use this on a real school database.');
 
     return 0;

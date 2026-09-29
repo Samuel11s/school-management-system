@@ -14,6 +14,7 @@
     "require": {
         "php": "^8.3",
         "dedoc/scramble": "^0.13.45",
+        "fakerphp/faker": "^1.23",
         "laravel/fortify": "^1.40",
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.0",
@@ -23,7 +24,6 @@
         "spatie/laravel-query-builder": "^7.3"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.12",
         "laravel/pail": "^1.2.5",
         "laravel/pint": "^1.27",
