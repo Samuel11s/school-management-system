@@ -27,8 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectGuestsTo(fn () => route('login'));
 
-        // Behind a TLS-terminating load balancer or reverse proxy.
-        $middleware->trustProxies(at: env('TRUSTED_PROXIES') ? explode(',', (string) env('TRUSTED_PROXIES')) : null);
+        // Behind a TLS-terminating load balancer or reverse proxy. Passed as a
+        // string: Laravel only honours the "*" wildcard in string form and
+        // splits comma-separated address lists itself.
+        $middleware->trustProxies(at: env('TRUSTED_PROXIES') ?: null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
